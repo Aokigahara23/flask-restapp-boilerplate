@@ -79,6 +79,7 @@ class DevConfig(Config):
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=15)
 
+# TODO: implement unit tests for this project. Ye ye, TDD :(
 # class TestConfig(Config):
 #     """Test configuration."""
 #

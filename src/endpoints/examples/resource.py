@@ -7,6 +7,8 @@ from .schema import KittySchema
 
 
 class KittyListEP(Resource):
+    """Example API resource for a list of objects"""
+
     url: str = '/kitties'
     alias = 'kitties'
 
@@ -29,6 +31,8 @@ class KittyListEP(Resource):
 
 
 class KittyEP(Resource):
+    """Example API resource for a specific object"""
+
     url: str = '/kitties/<int:kitty_id>'
     alias = 'kitty'
 

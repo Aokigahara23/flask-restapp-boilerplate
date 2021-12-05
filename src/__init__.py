@@ -33,7 +33,7 @@ def register_extensions(app: Flask) -> None:
 
 
 def create_app() -> Flask:
-    """Flask app creation"""
+    """Flask app initiation"""
 
     app = Flask('kitty-tube')
 

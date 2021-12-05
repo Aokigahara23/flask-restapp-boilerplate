@@ -10,6 +10,7 @@ def error_response(message: str,
                    status_code: int,
                    extra_headers: Optional[Dict[str, str]] = None,
                    **additional_information: Dict[str, Any]) -> Response:
+    """Common error response to ensure that API error output has the same format"""
     common_struct = dict(error_message=message, status_code=status_code, additional_information=additional_information)
     resp = make_response(common_struct, status_code)
     resp.headers.extend(extra_headers or {})
