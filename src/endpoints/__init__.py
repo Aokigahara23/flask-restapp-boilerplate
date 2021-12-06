@@ -1,5 +1,10 @@
-from .kitties import kitties
+from typing import List
+from flask import Blueprint
 
-endpoints = [
-    kitties
+from .kitties import kitties
+from .auth import auth
+
+endpoints: List[Blueprint] = [
+    kitties,
+    auth
 ]

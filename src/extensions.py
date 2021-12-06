@@ -20,9 +20,11 @@ class CRUDMixin(Model):
     """Mixin that adds convenience methods for CRUD (create, read, update, delete) operations."""
 
     @classmethod
-    def create(cls, **kwargs):
+    def create(cls, save: bool = True, **kwargs):
         """Create a new record and save it the database."""
         instance = cls(**kwargs)
+        if not save:
+            return instance
         return instance.save()
 
     def update(self, commit=True, **kwargs):
