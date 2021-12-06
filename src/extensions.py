@@ -1,20 +1,23 @@
 from flask_bcrypt import Bcrypt
+from flask_caching import Cache
 from flask_jwt_extended import JWTManager
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
-from flask_restful import Api
+from flask_msearch import Search
 from flask_sqlalchemy import SQLAlchemy, Model
+
+database = SQLAlchemy()
+migrate = Migrate()
+deserializer = Marshmallow()
+cache = Cache()
+search = Search()
+
+jwt = JWTManager()
+bcrypt = Bcrypt()
 
 
 class CRUDMixin(Model):
     """Mixin that adds convenience methods for CRUD (create, read, update, delete) operations."""
-
-    @classmethod
-    def get_by_id(cls, record_id):
-        """Get record by ID."""
-        if any((isinstance(record_id, (str, bytes)) and record_id.isdigit(),
-                isinstance(record_id, (int, float)))):
-            return cls.query.get(int(record_id))
 
     @classmethod
     def create(cls, **kwargs):
@@ -41,11 +44,18 @@ class CRUDMixin(Model):
         return commit and database.session.commit()
 
 
-api = Api(prefix='/api/v1')
+class SurrogatePK(object):
+    """A mixin that adds a surrogate integer 'primary key' column named ``id`` \
+        to any declarative-mapped class.
+    """
 
-database = SQLAlchemy()
-migrate = Migrate()
-deserializer = Marshmallow()
+    __table_args__ = {'extend_existing': True}
 
-jwt = JWTManager()
-bcrypt = Bcrypt()
+    id = database.Column(database.Integer, primary_key=True)
+
+    @classmethod
+    def get_by_id(cls, record_id):
+        """Get record by ID."""
+        if any((isinstance(record_id, (str, bytes)) and record_id.isdigit(),
+                isinstance(record_id, (int, float)))):
+            return cls.query.get(int(record_id))

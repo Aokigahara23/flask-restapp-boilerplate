@@ -1,6 +1,5 @@
-from .examples import KittyListEP, KittyEP
+from .kitties import kitties
 
 endpoints = [
-    KittyListEP,
-    KittyEP
+    kitties
 ]
