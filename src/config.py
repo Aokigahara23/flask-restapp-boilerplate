@@ -17,9 +17,11 @@ class Config(object):
     """Base configuration."""
 
     # FLASK_COMMON
+    APP_URL_ROOT = '/api/v1/'
     SECRET_KEY = os.environ.get('REST_KEY', secrets.token_urlsafe(20))
     APP_DIR = os.path.abspath(os.path.dirname(__file__))
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
+    BUNDLE_ERRORS = True
 
     # BCRYPT CONFIG
     BCRYPT_LOG_ROUNDS = 13

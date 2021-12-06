@@ -3,7 +3,19 @@ from typing import Dict, Any
 
 from flask import Response, make_response
 
+APP_ROOT = '/api/v1'
+
 HTTP_STATUS = HTTPStatus
+
+
+class HttpMethods:
+    POST = 'POST'
+    GET = 'GET'
+    UPDATE = 'UPDATE'
+    PATCH = 'PATCH'
+
+
+HTTP_METHODS = HttpMethods
 
 
 def response_template(data: Dict[str, Any],

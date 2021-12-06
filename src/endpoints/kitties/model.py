@@ -1,6 +1,6 @@
 from enum import Enum
 
-from src.extensions import SurrogatePK, database
+from src.extensions import SurrogatePK, database, CRUDMixin
 
 
 class CatBreed(Enum):
@@ -9,7 +9,7 @@ class CatBreed(Enum):
     SIAM = 'siamese cat'
 
 
-class Kitty(database.Model, SurrogatePK):
+class Kitty(database.Model, SurrogatePK, CRUDMixin):
     """example model with enum field and relation"""
 
     __tablename__ = 'kitties'
