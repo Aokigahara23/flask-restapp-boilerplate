@@ -5,15 +5,15 @@ from src.common import response_template, HTTP_METHODS, HTTP_STATUS
 from src.exceptions import error_response
 from src.extensions import cache
 from .model import User
-from .parser import reg_parser, login_parser
+from .parser import auth_parser
 from .schema import UserSchema
 
-auth = Blueprint('auth', __name__)
+auth_endpoint = Blueprint('auth', __name__)
 
 
-@auth.route('/register', methods=(HTTP_METHODS.POST,))
+@auth_endpoint.route('/register', methods=(HTTP_METHODS.POST,))
 def register():
-    args = reg_parser.parse_args()
+    args = auth_parser.parse_args()
     user = User.create(
         save=False,
         email=args.email,
@@ -28,9 +28,9 @@ def register():
         HTTP_STATUS.CREATED)
 
 
-@auth.route('/login', methods=(HTTP_METHODS.POST,))
+@auth_endpoint.route('/login', methods=(HTTP_METHODS.POST,))
 def login():
-    args = login_parser.parse_args()
+    args = auth_parser.parse_args(include_only=('email', 'password'))
     user = User.query.get(args.email)
     if user is None or not user.check_password(args.password):
         return error_response(
@@ -47,7 +47,7 @@ def login():
         refresh_token=refresh_token)
 
 
-@auth.route('/login', methods=(HTTP_METHODS.GET,))
+@auth_endpoint.route('/login', methods=(HTTP_METHODS.GET,))
 @jwt_required()
 @cache.cached(key_prefix='check_auth')
 def check_auth():

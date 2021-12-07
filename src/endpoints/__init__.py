@@ -1,10 +1,10 @@
 from typing import List
 from flask import Blueprint
 
-from .kitties import kitties
-from .auth import auth
+from .kitties import kitties_endpoint
+from .auth import auth_endpoint
 
 endpoints: List[Blueprint] = [
-    kitties,
-    auth
+    kitties_endpoint,
+    auth_endpoint
 ]
