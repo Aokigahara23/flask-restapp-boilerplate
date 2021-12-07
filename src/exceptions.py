@@ -27,10 +27,9 @@ def item_not_found_response(item_repr: str, searched_id: Union[str, int] = None)
     return error_response(f'Could not find item <{item_repr}>', HTTP_STATUS.NOT_FOUND)
 
 
-# TODO: debug this and make it more informative (in a right way)
 @jwt.expired_token_loader
-def expired_token_response(jwt_header, jwt_payload) -> Response:
-    return error_response(f'Token: {jwt_header} - {jwt_payload} has expired', HTTP_STATUS.UNAUTHORIZED)
+def expired_token_response(*args) -> Response:
+    return error_response(f'Token has expired', HTTP_STATUS.UNAUTHORIZED)
 
 
 @jwt.invalid_token_loader

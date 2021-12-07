@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Dict, Any
+from typing import Dict, Any, List, Union
 
 from flask import Response, make_response
 
@@ -18,7 +18,7 @@ class HttpMethods:
 HTTP_METHODS = HttpMethods
 
 
-def response_template(data: Dict[str, Any],
+def response_template(data: Union[Dict[str, Any], List[Dict[str, Any]]],
                       status_code: int,
                       extra_headers: Dict[str, str] = None,
                       **additional_information: Dict[str, Any]) -> Response:
