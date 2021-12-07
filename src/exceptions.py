@@ -38,7 +38,7 @@ def invalid_token_response(error) -> Response:
 
 
 @jwt.unauthorized_loader
-def no_jwt_is_present(error):
+def no_jwt_is_present(error) -> Response:
     return error_response(error, HTTP_STATUS.UNAUTHORIZED)
 
 
@@ -52,19 +52,19 @@ class BadArgs(Conflict):
 
 def register_exceptions(app: Flask) -> None:
     @app.errorhandler(HTTP_STATUS.METHOD_NOT_ALLOWED)
-    def not_allowed(e):
+    def not_allowed(e) -> Response:
         return error_response(str(e), HTTP_STATUS.METHOD_NOT_ALLOWED)
 
     @app.errorhandler(HTTP_STATUS.NOT_FOUND)
-    def not_found(e):
+    def not_found(e) -> Response:
         return error_response(str(e), HTTP_STATUS.NOT_FOUND)
 
     @app.errorhandler(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-    def internal_error(e):
+    def internal_error(e) -> Response:
         return error_response(str(e), HTTP_STATUS.INTERNAL_SERVER_ERROR)
 
     @app.errorhandler(HTTP_STATUS.CONFLICT)
-    def invalid_args_passed(e):
+    def invalid_args_passed(e) -> Response:
         err_dict = dict(message='Invalid request arguments')
         if e.description is not None:
             err_dict['details'] = e.description

@@ -5,3 +5,6 @@ kitty_list_parser = RequestParser()
 kitty_list_parser.add_argument('name', required=True)
 kitty_list_parser.add_argument('age', type=int, required=True)
 kitty_list_parser.add_argument('breed', type=str, required=True, choices=[breed.name for breed in CatBreed])
+
+kitty_list_filters = RequestParser()
+kitty_list_filters.add_argument('search_word', type=str)

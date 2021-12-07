@@ -11,6 +11,8 @@ from .schema import UserSchema
 auth_endpoint = Blueprint('auth', __name__)
 
 
+# /register
+
 @auth_endpoint.route('/register', methods=(HTTP_METHODS.POST,))
 def register():
     args = auth_parser.parse_args()
@@ -27,6 +29,8 @@ def register():
         UserSchema().dump(user),
         HTTP_STATUS.CREATED)
 
+
+# /login
 
 @auth_endpoint.route('/login', methods=(HTTP_METHODS.POST,))
 def login():
