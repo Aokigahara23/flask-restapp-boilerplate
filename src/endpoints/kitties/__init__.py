@@ -1,12 +1,12 @@
-from flask import Blueprint, request
+from flask import Blueprint
 from flask_jwt_extended import jwt_required
 
 from src.common import response_template, HTTP_STATUS, HTTP_METHODS
 from src.exceptions import item_not_found_response
 from src.extensions import cache
-from src.request_parser import perform_pagination
+from src.request_parser import paginate_and_filter
 from .model import Kitty, CatBreed
-from .parser import kitty_list_parser, kitty_list_filters
+from .parser import kitty_list_parser
 from .schema import KittySchema
 
 kitties_endpoint = Blueprint('kitties', __name__, url_prefix='kitties')
@@ -15,24 +15,9 @@ kitties_endpoint = Blueprint('kitties', __name__, url_prefix='kitties')
 # /kitties
 
 @kitties_endpoint.route('', methods=(HTTP_METHODS.GET,))
-# @jwt_required()
+@jwt_required()
 def get_kitties():
-    cache_key = f'{Kitty.__name__}{request.query_string.decode()}'
-    cached_data = cache.get(cache_key)
-    if cached_data:
-        kitties, pagination = cached_data
-    else:
-        kitties = Kitty.query
-
-        args = kitty_list_filters.parse_args()
-        if args.search_word:
-            kitties = kitties.msearch(args.search_word)
-
-        kitties, pagination = perform_pagination(kitties)
-        kitties = KittySchema(many=True).dump(kitties)
-
-        cache.set(cache_key, (kitties, pagination))
-
+    kitties, pagination = paginate_and_filter(Kitty, KittySchema(many=True))
     return response_template(
         kitties,
         HTTP_STATUS.OK, None,
@@ -55,7 +40,6 @@ def create_kitty():
 # /kitties/id
 @kitties_endpoint.route('/<int:kitty_id>', methods=(HTTP_METHODS.GET,))
 @jwt_required()
-@cache.cached()
 def get_kitty(kitty_id: int):
     kitty = Kitty.query.get(kitty_id)
     if kitty is None:

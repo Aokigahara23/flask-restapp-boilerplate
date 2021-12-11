@@ -1,8 +1,10 @@
 from argparse import Namespace
 from typing import Type, Optional, Tuple, Dict, Any
 
-from flask import request
-from flask_sqlalchemy import BaseQuery
+from flask import request, current_app
+from flask_sqlalchemy import Model
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from sqlalchemy import desc, asc
 from werkzeug.exceptions import NotFound
 
 from src.common import HTTP_METHODS
@@ -126,22 +128,54 @@ pagination_parser = RequestParser()
 pagination_parser.add_argument('page', type=int)
 pagination_parser.add_argument('per_page', type=int)
 
+filter_parser = RequestParser()
+filter_parser.add_argument('search_word', type=str)
+filter_parser.add_argument('order_by', type=str)
+filter_parser.add_argument('order_direction', type=str, choices=('asd', 'desc'), default='asc')
 
-def perform_pagination(query: BaseQuery) -> Tuple[BaseQuery, Dict[str, Any]]:
+
+def paginate_and_filter(
+        model: Type[Model],
+        deserializer: SQLAlchemyAutoSchema
+) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """
-    Try to perform a pagination operation and return a query.
+    Paginate and filter query for multiple entities
 
-    :param query: Sqlalchemy query to paginate
+    :param T model: Sqlalchemy model, which query is user to paginate
+    :param deserializer: Marshmallow schema to dump. It is done to store it in the cache
 
     :return: query and pagination data as Tuple[BaseQuery, Dict[str, Any]]
     """
+    from src.extensions import cache
+
+    query = model.query
+
+    cache_key = f'{model.__name__}{request.query_string.decode()}'
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        cached_query, cached_pagination = cached_data
+        return cached_query, cached_pagination
+
+    filters = filter_parser.parse_args()
+
+    if filters.search_word is not None:
+        query = query.msearch(filters.search_word)
+
+    if filters.order_by and filters.order_direction:
+        model_attr = getattr(model, filters.order_by)
+        if model_attr is not None:
+            direction_func = desc if filters.order_direction == 'desc' else asc
+            query.order_by(direction_func(model_attr))
 
     pagination_args = pagination_parser.parse_args()
     pagination_result = dict()
 
-    if pagination_parser.has_passed_args('page', 'per_page'):
+    if pagination_args.page:
         try:
-            pagination = query.paginate(pagination_args.page, pagination_args.per_page)
+            per_page = pagination_args.per_page \
+                       or current_app.config.get('DEFAULT_PER_PAGE_LIMIT') \
+                       or 15
+            pagination = query.paginate(pagination_args.page, per_page)
             query = pagination.items
             pagination_result['page'] = pagination.page
             pagination_result['per_page'] = pagination.per_page
@@ -151,6 +185,9 @@ def perform_pagination(query: BaseQuery) -> Tuple[BaseQuery, Dict[str, Any]]:
             pagination_result['has_prev'] = pagination.has_prev
         except NotFound:
             raise NotFound('Could not find the requested page')
+
+    query = deserializer.dump(query)
+    cache.set(cache_key, (query, pagination_result))
 
     return query, pagination_result
 
