@@ -1,5 +1,5 @@
-from .model import User
 from src.extensions import deserializer
+from .model import User
 
 
 class UserSchema(deserializer.SQLAlchemyAutoSchema):

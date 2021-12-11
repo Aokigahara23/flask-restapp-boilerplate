@@ -13,6 +13,7 @@ class Kitty(database.Model, SurrogatePK, CRUDMixin):
     """example model with enum field and relation"""
 
     __tablename__ = 'kitties'
+    __searchable__ = ['name', 'breed']
 
     name = database.Column(database.String(20))
     age = database.Column(database.Integer)
@@ -23,7 +24,10 @@ class Kitty(database.Model, SurrogatePK, CRUDMixin):
 
     kittens = database.relationship('Kitty')
 
-    def produce_kitten(self, name: str):
+    def __repr__(self):
+        return f'<Kitty(id:{self.id}, name:{self.name}, breed:{self.breed})>'
+
+    def produce_kitten(self, name: str) -> 'Kitty':
         return Kitty.create(
             name=name,
             age=0,

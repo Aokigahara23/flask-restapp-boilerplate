@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required
 from src.common import response_template, HTTP_STATUS, HTTP_METHODS
 from src.exceptions import item_not_found_response
 from src.extensions import cache
-from src.request_parser import pagination_attempt
+from src.request_parser import paginate_and_filter
 from .model import Kitty, CatBreed
 from .parser import kitty_list_parser
 from .schema import KittySchema
@@ -17,7 +17,7 @@ kitties_endpoint = Blueprint('kitties', __name__, url_prefix='kitties')
 @kitties_endpoint.route('', methods=(HTTP_METHODS.GET,))
 @jwt_required()
 def get_kitties():
-    kitties, pagination = pagination_attempt(Kitty, KittySchema(many=True), cache)
+    kitties, pagination = paginate_and_filter(Kitty, KittySchema(many=True))
     return response_template(
         kitties,
         HTTP_STATUS.OK, None,
@@ -40,7 +40,6 @@ def create_kitty():
 # /kitties/id
 @kitties_endpoint.route('/<int:kitty_id>', methods=(HTTP_METHODS.GET,))
 @jwt_required()
-@cache.cached()
 def get_kitty(kitty_id: int):
     kitty = Kitty.query.get(kitty_id)
     if kitty is None:

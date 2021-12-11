@@ -47,7 +47,8 @@ class CRUDMixin(Model):
 
 
 class SurrogatePK(object):
-    """A mixin that adds a surrogate integer 'primary key' column named ``id`` \
+    """
+    A mixin that adds a surrogate integer 'primary key' column named `id`
         to any declarative-mapped class.
     """
 
