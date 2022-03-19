@@ -1,19 +1,6 @@
-from flask_bcrypt import Bcrypt
-from flask_caching import Cache
-from flask_jwt_extended import JWTManager
-from flask_marshmallow import Marshmallow
-from flask_migrate import Migrate
-from flask_msearch import Search
-from flask_sqlalchemy import SQLAlchemy, Model
+from flask_sqlalchemy import Model
 
-database = SQLAlchemy()
-migrate = Migrate()
-deserializer = Marshmallow()
-cache = Cache()
-search = Search()
-
-jwt = JWTManager()
-bcrypt = Bcrypt()
+from . import database
 
 
 class CRUDMixin(Model):

@@ -1,29 +1,27 @@
-from http import HTTPStatus
-from typing import Dict, Any, List, Union
+from typing import Union, Dict, Any
 
-from flask import Response, make_response
-
-APP_ROOT = '/api/v1'
-
-HTTP_STATUS = HTTPStatus
+from flask import make_response, Response
 
 
 class HttpMethods:
-    POST = 'POST'
     GET = 'GET'
-    UPDATE = 'UPDATE'
+    POST = 'POST'
+    PUT = 'PUT'
+    DELETE = 'DELETE'
     PATCH = 'PATCH'
 
 
-HTTP_METHODS = HttpMethods
-
-
-def response_template(data: Union[Dict[str, Any], List[Dict[str, Any]]],
+def response_template(data: Union[dict, list, str],
                       status_code: int,
                       extra_headers: Dict[str, str] = None,
                       **additional_information: Dict[str, Any]) -> Response:
     """Common response template to ensure any correct API output has the same format"""
-    common_struct = dict(body=data, status_code=status_code, additional_information=additional_information)
+    common_struct = dict(status_code=status_code, additional_information=additional_information)
+    if isinstance(data, str):
+        common_struct['message'] = data
+    else:
+        common_struct['body'] = data
+
     resp = make_response(common_struct, status_code)
     resp.headers.extend(extra_headers or {})
     return resp

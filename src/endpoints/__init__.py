@@ -1,14 +1,7 @@
-from typing import List
-from flask import Blueprint
+__all__ = ('endpoints',)
 
-from .kitties import kitties_endpoint
-from .auth import auth_endpoint
+from src.endpoints.auth import auth_endpoint
 
-"""
-Import all endpoints to a list
-"""
-
-endpoints: List[Blueprint] = [
-    kitties_endpoint,
+endpoints = [
     auth_endpoint
 ]
